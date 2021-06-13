@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs')
+const { render } = require('../app')
 const { User } = require('../models')
 
 const userController = {
@@ -30,6 +31,18 @@ const userController = {
     } catch (error) {
       console.error(error)
     }
+  },
+  signInPage: (req, res) => {
+    return res.render('signin')
+  },
+  signIn: (req, res) => {
+    req.flash('success_messages', '成功登入。')
+    return res.redirect('/restaurants')
+  },
+  logout: (req, res) => {
+    req.logout()
+    req.flash('success_messages', '成功登出。')
+    return res.redirect('/signin')
   }
 }
 

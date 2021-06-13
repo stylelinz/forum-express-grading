@@ -2,7 +2,8 @@ const express = require('express')
 const exphbs = require('express-handlebars')
 const session = require('express-session')
 const flash = require('connect-flash')
-const passport = require('passport')
+
+const passport = require('./config/passport')
 
 const app = express()
 const port = 3000
@@ -32,6 +33,6 @@ app.listen(port, () => {
   console.log(`Express is listening at http://localhost:${port}`)
 })
 
-require('./routes')(app)
+require('./routes')(app, passport)
 
 module.exports = app
