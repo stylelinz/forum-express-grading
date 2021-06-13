@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs')
-const { render } = require('../app')
 const { User } = require('../models')
 
 const userController = {
