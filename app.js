@@ -3,6 +3,7 @@ const exphbs = require('express-handlebars')
 const session = require('express-session')
 const flash = require('connect-flash')
 const methodOverride = require('method-override')
+const path = require('path')
 
 const passport = require('./config/passport')
 
@@ -21,6 +22,7 @@ app.use(session({
   saveUninitialized: false
 }))
 app.use(methodOverride('_method'))
+app.use('/upload', express.static(path.join(__dirname, '/upload')))
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())

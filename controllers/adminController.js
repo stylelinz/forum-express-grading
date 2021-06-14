@@ -1,3 +1,5 @@
+const fs = require('fs/promises')
+
 const { Restaurant } = require('../models')
 
 const adminController = {
@@ -23,13 +25,20 @@ const adminController = {
       req.flash('error_messages', '名稱為必填。')
       return res.redirect('back')
     }
+
     try {
+      const { file } = req
+      if (file) {
+        const data = await fs.readFile(file.path)
+        await fs.writeFile(`upload/${file.originalname}`, data)
+      }
       await Restaurant.create({
         name,
         tel,
         address,
         opening_hours,
-        description
+        description,
+        image: file ? `/upload/${file.originalname}` : null
       })
       req.flash('success_messages', '新增餐廳成功。')
       return res.redirect('/admin/restaurants')
@@ -66,13 +75,19 @@ const adminController = {
       return res.redirect('back')
     }
     try {
+      const { file } = req
+      if (file) {
+        const data = await fs.readFile(file.path)
+        await fs.writeFile(`upload/${file.originalname}`, data)
+      }
       const restaurant = await Restaurant.findByPk(req.params.id)
       await restaurant.update({
         name,
         tel,
         address,
         opening_hours,
-        description
+        description,
+        image: file ? `/upload/${file.originalname}` : restaurant.image
       })
       req.flash('success_messages', `餐廳 ${name} 更新成功。`)
       return res.redirect('/admin/restaurants')
