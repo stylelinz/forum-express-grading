@@ -47,6 +47,16 @@ const adminController = {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
     }
+  },
+
+  editRestaurant: async (req, res) => {
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id, { raw: true })
+      return res.render('admin/create', { restaurant })
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
   }
 }
 
