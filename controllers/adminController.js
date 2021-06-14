@@ -80,6 +80,18 @@ const adminController = {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
     }
+  },
+
+  deleteRestaurant: async (req, res) => {
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id)
+      await restaurant.destroy()
+      req.flash('success_messages', '餐廳刪除成功。')
+      return res.redirect('/admin/restaurants')
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
   }
 }
 
