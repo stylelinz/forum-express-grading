@@ -57,6 +57,29 @@ const adminController = {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
     }
+  },
+
+  putRestaurant: async (req, res) => {
+    const { name, tel, address, opening_hours, description } = req.body
+    if (!name) {
+      req.flash('error_messages', '名稱為必填。')
+      return res.redirect('back')
+    }
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id)
+      await restaurant.update({
+        name,
+        tel,
+        address,
+        opening_hours,
+        description
+      })
+      req.flash('success_messages', `餐廳 ${name} 更新成功。`)
+      return res.redirect('/admin/restaurants')
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
   }
 }
 
