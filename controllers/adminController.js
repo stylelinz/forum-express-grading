@@ -12,9 +12,11 @@ const adminController = {
       console.error(error)
     }
   },
+
   createRestaurant: (req, res) => {
     return res.render('admin/create')
   },
+
   postRestaurant: async (req, res) => {
     const { name, tel, address, opening_hours, description } = req.body
     if (!name) {
@@ -34,6 +36,16 @@ const adminController = {
     } catch (error) {
       console.error(error)
       res.redirect('back')
+    }
+  },
+
+  getRestaurant: async (req, res) => {
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id, { raw: true })
+      return res.render('admin/restaurant', { restaurant })
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
     }
   }
 }
