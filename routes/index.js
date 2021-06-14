@@ -9,6 +9,7 @@ module.exports = (app, passport) => {
     }
     return res.redirect('/signin')
   }
+
   const authenticateAdmin = (req, res, next) => {
     if (req.isAuthenticated()) {
       if (req.user.isAdmin) {
@@ -26,6 +27,8 @@ module.exports = (app, passport) => {
   // 後台
   app.get('/admin', authenticateAdmin, (req, res) => res.redirect('/admin/restaurants'))
   app.get('/admin/restaurants', authenticateAdmin, adminController.getRestaurants)
+  app.get('/admin/restaurants/create', authenticateAdmin, adminController.createRestaurant)
+  app.post('/admin/restaurants', authenticateAdmin, adminController.postRestaurant)
 
   // 使用者
   app.get('/signup', userController.signUpPage)
