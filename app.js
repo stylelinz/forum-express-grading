@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== 'production') {
 const passport = require('./config/passport')
 
 const app = express()
-const port = 3000
+const port = Number(process.env.PORT)
 
 app.engine('hbs', exphbs({
   defaultLayout: 'main',
