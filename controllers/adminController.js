@@ -1,4 +1,16 @@
-const fs = require('fs/promises')
+const imgur = require('imgur-node-api')
+
+const upload = (path) => {
+  imgur.setClientID(process.env.IMGUR_ID)
+  return new Promise((resolve, reject) => {
+    imgur.upload(path, (err, img) => {
+      if (err) {
+        return reject(err)
+      }
+      return resolve(img)
+    })
+  })
+}
 
 const { Restaurant } = require('../models')
 
@@ -28,9 +40,9 @@ const adminController = {
 
     try {
       const { file } = req
+      let img
       if (file) {
-        const data = await fs.readFile(file.path)
-        await fs.writeFile(`upload/${file.originalname}`, data)
+        img = await upload(file.path)
       }
       await Restaurant.create({
         name,
@@ -38,7 +50,7 @@ const adminController = {
         address,
         opening_hours,
         description,
-        image: file ? `/upload/${file.originalname}` : null
+        image: img.data.link ?? null
       })
       req.flash('success_messages', '新增餐廳成功。')
       return res.redirect('/admin/restaurants')
@@ -76,9 +88,9 @@ const adminController = {
     }
     try {
       const { file } = req
+      let img
       if (file) {
-        const data = await fs.readFile(file.path)
-        await fs.writeFile(`upload/${file.originalname}`, data)
+        img = await upload(file.path)
       }
       const restaurant = await Restaurant.findByPk(req.params.id)
       await restaurant.update({
@@ -87,7 +99,7 @@ const adminController = {
         address,
         opening_hours,
         description,
-        image: file ? `/upload/${file.originalname}` : restaurant.image
+        image: img.data.link ?? restaurant.image
       })
       req.flash('success_messages', `餐廳 ${name} 更新成功。`)
       return res.redirect('/admin/restaurants')
