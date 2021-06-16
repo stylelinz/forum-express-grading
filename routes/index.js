@@ -1,9 +1,7 @@
-const multer = require('multer')
-const upload = multer({ dest: 'temp/' })
-
 const restController = require('../controllers/restController')
-const adminController = require('../controllers/adminController')
 const userController = require('../controllers/userController')
+
+const adminRoute = require('./adminRoute')
 
 const helpers = require('../_helpers')
 
@@ -30,14 +28,7 @@ module.exports = (app, passport) => {
   app.get('/restaurants', authenticateUser, restController.getRestaurants)
 
   // 後台
-  app.get('/admin', authenticateAdmin, (req, res) => res.redirect('/admin/restaurants'))
-  app.get('/admin/restaurants', authenticateAdmin, adminController.getRestaurants)
-  app.get('/admin/restaurants/create', authenticateAdmin, adminController.createRestaurant)
-  app.post('/admin/restaurants', authenticateAdmin, upload.single('image'), adminController.postRestaurant)
-  app.get('/admin/restaurants/:id', authenticateAdmin, adminController.getRestaurant)
-  app.get('/admin/restaurants/:id/edit', authenticateAdmin, adminController.editRestaurant)
-  app.put('/admin/restaurants/:id', authenticateAdmin, upload.single('image'), adminController.putRestaurant)
-  app.delete('/admin/restaurants/:id', authenticateAdmin, adminController.deleteRestaurant)
+  app.use('/admin', authenticateAdmin, adminRoute)
 
   // 使用者
   app.get('/signup', userController.signUpPage)
