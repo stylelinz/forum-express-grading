@@ -1,5 +1,8 @@
 const imgur = require('imgur-node-api')
 
+const { Restaurant, User, sequelize } = require('../models')
+
+// Helper function to upload image
 const upload = (path) => {
   imgur.setClientID(process.env.IMGUR_ID)
   return new Promise((resolve, reject) => {
@@ -12,9 +15,20 @@ const upload = (path) => {
   })
 }
 
-const { Restaurant } = require('../models')
+// Helper function to get numbers of admins
+const getAdmins = async () => {
+  const [{ adminCount }] = await User.findAll({
+    where: { isAdmin: true },
+    attributes: [
+      [sequelize.fn('count', sequelize.col('isAdmin')), 'adminCount']
+    ],
+    raw: true
+  })
+  return adminCount
+}
 
 const adminController = {
+  // Restaurants
   getRestaurants: async (req, res) => {
     try {
       const restaurants = await Restaurant.findAll({
@@ -115,6 +129,44 @@ const adminController = {
       await restaurant.destroy()
       req.flash('success_messages', '餐廳刪除成功。')
       return res.redirect('/admin/restaurants')
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
+  },
+
+  // Users
+  getUsers: async (req, res) => {
+    try {
+      const users = await User.findAll({
+        raw: true, nest: true
+      })
+      return res.render('admin/users', { users })
+    } catch (error) {
+      console.error(error)
+      return res.redirect('back')
+    }
+  },
+
+  toggleAdmin: async (req, res) => {
+    try {
+      const [user, adminCount] = await Promise.all([
+        User.findByPk(req.params.id),
+        getAdmins()
+      ])
+      console.log(adminCount)
+      console.log(user.isAdmin)
+
+      // 避免沒有使用者的狀況出現
+      if (adminCount <= 1 && user.isAdmin) {
+        throw Error('It should have at least one admin.')
+      }
+
+      await user.update({
+        isAdmin: !user.isAdmin
+      })
+      req.flash('success_messages', 'The role of user is changed.')
+      return res.redirect('/admin/users')
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')

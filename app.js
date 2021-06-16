@@ -16,7 +16,10 @@ const port = Number(process.env.PORT)
 
 app.engine('hbs', exphbs({
   defaultLayout: 'main',
-  extname: '.hbs'
+  extname: '.hbs',
+  helpers: {
+    noteq: helpers.noteq
+  }
 }))
 app.set('view engine', 'hbs')
 app.use(express.urlencoded({ extended: true }))
