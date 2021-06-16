@@ -1,5 +1,7 @@
 const imgur = require('imgur-node-api')
 
+const { Restaurant, User } = require('../models')
+
 const upload = (path) => {
   imgur.setClientID(process.env.IMGUR_ID)
   return new Promise((resolve, reject) => {
@@ -12,9 +14,8 @@ const upload = (path) => {
   })
 }
 
-const { Restaurant } = require('../models')
-
 const adminController = {
+  // Restaurants
   getRestaurants: async (req, res) => {
     try {
       const restaurants = await Restaurant.findAll({
@@ -115,6 +116,39 @@ const adminController = {
       await restaurant.destroy()
       req.flash('success_messages', '餐廳刪除成功。')
       return res.redirect('/admin/restaurants')
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
+  },
+
+  // Users
+  getUsers: async (req, res) => {
+    try {
+      const users = await User.findAll({
+        raw: true, nest: true
+      })
+      return res.render('admin/users', { users })
+    } catch (error) {
+      console.error(error)
+      return res.redirect('back')
+    }
+  },
+
+  toggleAdmin: async (req, res) => {
+    try {
+      const user = await User.findByPk(req.params.id)
+
+      // 判斷使用者是否想要更改自己的權限 (加了這塊，測試不會過)
+      // if (user.id === req.user.id) {
+      //   throw Error('Can not change role for yourself.')
+      // }
+
+      await user.update({
+        isAdmin: !user.isAdmin
+      })
+      req.flash('success_messages', 'The role of user is changed.')
+      return res.redirect('/admin/users')
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
