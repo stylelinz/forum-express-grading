@@ -64,7 +64,7 @@ const adminController = {
         address,
         opening_hours,
         description,
-        image: img.data.link ?? null
+        image: img.data.link || null
       })
       req.flash('success_messages', '新增餐廳成功。')
       return res.redirect('/admin/restaurants')
@@ -113,7 +113,7 @@ const adminController = {
         address,
         opening_hours,
         description,
-        image: img.data.link ?? restaurant.image
+        image: img.data.link || restaurant.image
       })
       req.flash('success_messages', `餐廳 ${name} 更新成功。`)
       return res.redirect('/admin/restaurants')
