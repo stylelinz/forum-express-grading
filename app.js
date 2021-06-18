@@ -12,7 +12,7 @@ const helpers = require('./_helpers')
 const passport = require('./config/passport')
 
 const app = express()
-const port = Number(process.env.PORT)
+const port = Number(process.env.PORT) || 3000
 
 app.engine('hbs', exphbs({
   defaultLayout: 'main',
