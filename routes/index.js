@@ -1,5 +1,6 @@
 const restController = require('../controllers/restController')
 const userController = require('../controllers/userController')
+const commentController = require('../controllers/commentController')
 
 const adminRoute = require('./adminRoute')
 
@@ -26,6 +27,9 @@ module.exports = (app, passport) => {
   // 前台
   app.get('/', authenticateUser, (req, res) => res.redirect('/restaurants'))
   app.get('/restaurants', authenticateUser, restController.getRestaurants)
+  app.get('/restaurants/:id', authenticateUser, restController.getRestaurant)
+  app.post('/comments', authenticateUser, commentController.postComment)
+  app.delete('/comments/:id', authenticateAdmin, commentController.deleteComment)
 
   // 後台
   app.use('/admin', authenticateAdmin, adminRoute)

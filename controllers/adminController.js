@@ -1,6 +1,6 @@
 const imgur = require('imgur-node-api')
 
-const { Restaurant, User, sequelize } = require('../models')
+const { Restaurant, User, Category, sequelize } = require('../models')
 
 // Helper function to upload image
 const upload = (path) => {
@@ -33,7 +33,8 @@ const adminController = {
     try {
       const restaurants = await Restaurant.findAll({
         raw: true,
-        nest: true
+        nest: true,
+        include: [Category]
       })
       return res.render('admin/restaurants', { restaurants })
     } catch (error) {
@@ -41,12 +42,20 @@ const adminController = {
     }
   },
 
-  createRestaurant: (req, res) => {
-    return res.render('admin/create')
+  createRestaurant: async (req, res) => {
+    try {
+      const categories = await Category.findAll({
+        raw: true
+      })
+      return res.render('admin/create', { categories })
+    } catch (error) {
+      req.flash(error.toString())
+      return res.redirect('back')
+    }
   },
 
   postRestaurant: async (req, res) => {
-    const { name, tel, address, opening_hours, description } = req.body
+    const { name, tel, address, opening_hours, description, CategoryId } = req.body
     if (!name) {
       req.flash('error_messages', '名稱為必填。')
       return res.redirect('back')
@@ -64,7 +73,8 @@ const adminController = {
         address,
         opening_hours,
         description,
-        image: img.data.link || null
+        image: img.data.link || null,
+        CategoryId
       })
       req.flash('success_messages', '新增餐廳成功。')
       return res.redirect('/admin/restaurants')
@@ -76,7 +86,9 @@ const adminController = {
 
   getRestaurant: async (req, res) => {
     try {
-      const restaurant = await Restaurant.findByPk(req.params.id, { raw: true })
+      const restaurant = await Restaurant.findByPk(req.params.id,
+        { raw: true, nest: true, include: [Category] }
+      )
       return res.render('admin/restaurant', { restaurant })
     } catch (error) {
       req.flash('error_messages', error.toString())
@@ -86,8 +98,11 @@ const adminController = {
 
   editRestaurant: async (req, res) => {
     try {
-      const restaurant = await Restaurant.findByPk(req.params.id, { raw: true })
-      return res.render('admin/create', { restaurant })
+      const [restaurant, categories] = await Promise.all([
+        Restaurant.findByPk(req.params.id, { raw: true }),
+        Category.findAll({ raw: true, nest: true })
+      ])
+      return res.render('admin/create', { restaurant, categories })
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
@@ -95,7 +110,7 @@ const adminController = {
   },
 
   putRestaurant: async (req, res) => {
-    const { name, tel, address, opening_hours, description } = req.body
+    const { name, tel, address, opening_hours, description, CategoryId } = req.body
     if (!name) {
       req.flash('error_messages', '名稱為必填。')
       return res.redirect('back')
@@ -113,7 +128,8 @@ const adminController = {
         address,
         opening_hours,
         description,
-        image: img.data.link || restaurant.image
+        image: img.data.link || restaurant.image,
+        CategoryId
       })
       req.flash('success_messages', `餐廳 ${name} 更新成功。`)
       return res.redirect('/admin/restaurants')
@@ -154,8 +170,6 @@ const adminController = {
         User.findByPk(req.params.id),
         getAdmins()
       ])
-      console.log(adminCount)
-      console.log(user.isAdmin)
 
       // 避免沒有使用者的狀況出現
       if (adminCount <= 1 && user.isAdmin) {

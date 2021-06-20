@@ -1,11 +1,4 @@
-<h1>餐廳後台</h1>
-
-<a href="/admin/restaurants">Restaurants</a>
-<span> | </span>
-<a href="/admin/users">Users</a>
-
-<br />
-<br />
+{{> admin }}
 
 <table class="table">
   <thead class="thead-dark">
@@ -25,18 +18,18 @@
         <td>{{this.email}}</td>
         <td>
           {{#if this.isAdmin}}
-          admin
+            admin
           {{else}}
-          user
+            user
           {{/if}}
         </td>
         <td>
           {{#noteq this.id 1}}
-          <form action="/admin/users/{{this.id}}/toggleAdmin?_method=PUT" method="POST" style="display: inline;">
-            <button type="submit" class="btn btn-link">
-              set as {{#if this.isAdmin}}user{{else}}admin{{/if}}
-            </button>
-          </form>
+            <form action="/admin/users/{{this.id}}/toggleAdmin?_method=PUT" method="POST" style="display: inline;">
+              <button type="submit" class="btn btn-link">
+                set as {{#if this.isAdmin}}user{{else}}admin{{/if}}
+              </button>
+            </form>
           {{/noteq}}
         </td>
       </tr>
