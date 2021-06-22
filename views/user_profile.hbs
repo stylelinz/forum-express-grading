@@ -12,3 +12,16 @@
   {{/eq}}
   </div>
 </div>
+
+<div class="card">
+  <div class="card-header"> {{profile.Comments.length}} 已評論餐廳</div>
+  <div class="card-body row">
+    {{#each profile.Comments}}
+    <div class="col-auto">
+      <a href="/restaurants/{{this.Restaurant.id}}"class="mr-3">
+        <img src="{{this.Restaurant.image}}" alt="{{this.Restaurant.name}}" style="width:100px;">
+      </a>
+    </div>
+    {{/each}}
+    </div>
+</div>

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
-const { User } = require('../models')
+const { User, Comment, Restaurant } = require('../models')
 
 // Helper function to upload image
 const upload = (path) => {
@@ -63,8 +63,17 @@ const userController = {
       if (!id) {
         throw new Error('Invalid user id.')
       }
-      const user = await User.findByPk(id)
-      return res.render('user_profile', { profile: user.toJSON() })
+      const user = (await User.findByPk(id, {
+        include: [
+          {
+            model: Comment,
+            include: [Restaurant],
+            nest: true
+          }
+        ],
+        nest: true
+      })).toJSON()
+      return res.render('user_profile', { profile: user })
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
@@ -87,8 +96,8 @@ const userController = {
     const { id } = req.params
     const { name } = req.body
     const { file } = req
-    const imgDataLink = file ? (await upload(file.path)).data.link : null
     try {
+      const imgDataLink = file ? (await upload(file.path)).data.link : null
       if (!name) {
         throw new Error('名稱為必填。')
       }
