@@ -64,6 +64,31 @@ const restController = {
       req.flash('error_messages', error.toString())
       return res.status(500).redirect('back')
     }
+  },
+
+  getFeeds: async (req, res) => {
+    try {
+      const [restaurants, comments] = await Promise.all([
+        Restaurant.findAll({
+          limit: 10,
+          order: [['updatedAt', 'DESC']],
+          include: [Category],
+          nest: true,
+          raw: true
+        }),
+        Comment.findAll({
+          limit: 10,
+          order: [['updatedAt', 'DESC']],
+          include: [Restaurant, User],
+          nest: true,
+          raw: true
+        })
+      ])
+      return res.render('feeds', { restaurants, comments })
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.render('back')
+    }
   }
 }
 
