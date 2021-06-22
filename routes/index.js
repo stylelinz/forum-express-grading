@@ -3,6 +3,7 @@ const userController = require('../controllers/userController')
 const commentController = require('../controllers/commentController')
 
 const adminRoute = require('./adminRoute')
+const userRoute = require('./userRoute')
 
 const helpers = require('../_helpers')
 
@@ -30,6 +31,7 @@ module.exports = (app, passport) => {
   app.get('/restaurants/:id', authenticateUser, restController.getRestaurant)
   app.post('/comments', authenticateUser, commentController.postComment)
   app.delete('/comments/:id', authenticateAdmin, commentController.deleteComment)
+  app.use('/users', authenticateUser, userRoute)
 
   // 後台
   app.use('/admin', authenticateAdmin, adminRoute)
