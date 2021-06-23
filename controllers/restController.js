@@ -31,7 +31,8 @@ const restController = {
       const restaurants = queryResults.rows.map(restaurant => ({
         ...restaurant.dataValues,
         description: restaurant.description.substring(0, 50),
-        categoryName: restaurant.Category.name
+        categoryName: restaurant.Category.name,
+        isFavorited: req.user.FavoritedRestaurants.map(rest => rest.id).includes(restaurant.id)
       }))
       return res.render('restaurants', {
         restaurants,
@@ -53,14 +54,13 @@ const restController = {
       const restaurant = await Restaurant.findByPk(id, {
         include: [
           Category,
-          {
-            model: Comment,
-            include: [User]
-          }
+          { model: Comment, include: [User] },
+          { model: User, as: 'FavoritedUsers' }
         ]
       })
+      const isFavorited = restaurant.FavoritedUsers.map(user => user.id).includes(req.user.id)
       await restaurant.increment('viewCount', { by: 1 })
-      return res.render('restaurant', { restaurant: restaurant.toJSON() })
+      return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited })
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.status(500).redirect('back')
