@@ -59,6 +59,7 @@ const restController = {
           }
         ]
       })
+      await restaurant.increment('viewCount', { by: 1 })
       return res.render('restaurant', { restaurant: restaurant.toJSON() })
     } catch (error) {
       req.flash('error_messages', error.toString())
@@ -88,6 +89,18 @@ const restController = {
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.render('back')
+    }
+  },
+
+  getDashboard: async (req, res) => {
+    try {
+      const restaurant = (await Restaurant.findByPk(req.params.id, {
+        include: [Comment, Category]
+      })).toJSON()
+      return res.render('dashboard', { restaurant })
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
     }
   }
 }
