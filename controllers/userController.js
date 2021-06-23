@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
-const { User, Comment, Restaurant } = require('../models')
+const { User, Comment, Restaurant, Favorite } = require('../models')
 
 // Helper function to upload image
 const upload = (path) => {
@@ -108,6 +108,33 @@ const userController = {
       })
       req.flash('success_message', '資料變更成功')
       return res.redirect(`/users/${id}`)
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
+  },
+  addFavorite: async (req, res) => {
+    try {
+      await Favorite.create({
+        UserId: req.user.id,
+        RestaurantId: req.params.restaurantId
+      })
+      return res.redirect('back')
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
+  },
+  removeFavorite: async (req, res) => {
+    try {
+      const favorite = await Favorite.findOne({
+        where: {
+          UserId: req.user.id,
+          RestaurantId: req.params.restaurantId
+        }
+      })
+      await favorite.destroy()
+      return res.redirect('back')
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')

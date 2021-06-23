@@ -31,8 +31,13 @@ module.exports = (app, passport) => {
   app.get('/restaurants/feeds', authenticateUser, restController.getFeeds)
   app.get('/restaurants/:id/dashboard', authenticateUser, restController.getDashboard)
   app.get('/restaurants/:id', authenticateUser, restController.getRestaurant)
+
   app.post('/comments', authenticateUser, commentController.postComment)
   app.delete('/comments/:id', authenticateAdmin, commentController.deleteComment)
+
+  app.post('/favorite/:restaurantId', authenticateUser, userController.addFavorite)
+  app.delete('/favorite/:restaurantId', authenticateUser, userController.removeFavorite)
+
   app.use('/users', authenticateUser, userRoute)
 
   // 後台
