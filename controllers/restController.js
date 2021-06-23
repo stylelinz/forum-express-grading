@@ -89,6 +89,18 @@ const restController = {
       req.flash('error_messages', error.toString())
       return res.render('back')
     }
+  },
+
+  getDashboard: async (req, res) => {
+    try {
+      const restaurant = (await Restaurant.findByPk(req.params.id, {
+        include: [Comment, Category]
+      })).toJSON()
+      return res.render('dashboard', { restaurant })
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
   }
 }
 
