@@ -58,9 +58,8 @@ const restController = {
           { model: User, as: 'FavoritedUsers' }
         ]
       })
-      const isFavorited = restaurant.FavoritedUsers.map(user => user.id).includes(req.user.id)
-      await restaurant.increment('viewCount', { by: 1 })
-      return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited })
+      await restaurant.increment('viewCounts', { by: 1 })
+      return res.render('restaurant', { restaurant: restaurant.toJSON() })
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.status(500).redirect('back')
