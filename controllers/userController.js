@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
 
 const helpers = require('../_helpers')
-const { User, Comment, Restaurant, Favorite, Like } = require('../models')
+const { User, Comment, Restaurant, Favorite, Like, Followship } = require('../models')
 
 // Helper function to upload image
 const upload = (path) => {
@@ -183,8 +183,37 @@ const userController = {
         isFollowed: req.user.Followings.map(followings => followings.id).includes(user.id)
       }))
 
-      topUsers.sort((a, b) => a.FollowerCount - b.FollowerCount)
+      topUsers.sort((a, b) => b.FollowerCount - a.FollowerCount)
       return res.render('topUser', { users: topUsers })
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
+  },
+  addFollow: async (req, res) => {
+    const { id: followerId } = req.user
+    try {
+      await Followship.create({
+        followerId,
+        followingId: req.params.userId
+      })
+      return res.redirect('back')
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
+  },
+  removeFollow: async (req, res) => {
+    const { id: FollowerId } = req.user
+    try {
+      const followship = await Followship.findOne({
+        where: {
+          FollowerId,
+          FollowingId: req.params.userId
+        }
+      })
+      await followship.destroy()
+      return res.redirect('back')
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
