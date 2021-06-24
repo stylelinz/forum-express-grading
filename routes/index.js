@@ -10,6 +10,9 @@ const helpers = require('../_helpers')
 module.exports = (app, passport) => {
   const authenticateUser = (req, res, next) => {
     if (helpers.ensureAuthenticated(req)) {
+      if (!req.user) {
+        req.user = helpers.getUser(req)
+      }
       return next()
     }
     return res.redirect('/signin')
@@ -37,6 +40,9 @@ module.exports = (app, passport) => {
 
   app.post('/favorite/:restaurantId', authenticateUser, userController.addFavorite)
   app.delete('/favorite/:restaurantId', authenticateUser, userController.removeFavorite)
+
+  app.post('/like/:restaurantId', authenticateUser, userController.addLike)
+  app.delete('/like/:restaurantId', authenticateUser, userController.removeLike)
 
   app.use('/users', authenticateUser, userRoute)
 

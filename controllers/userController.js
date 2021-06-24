@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs')
 const imgur = require('imgur-node-api')
-const { User, Comment, Restaurant, Favorite } = require('../models')
+
+const helpers = require('../_helpers')
+const { User, Comment, Restaurant, Favorite, Like } = require('../models')
 
 // Helper function to upload image
 const upload = (path) => {
@@ -134,6 +136,34 @@ const userController = {
         }
       })
       await favorite.destroy()
+      return res.redirect('back')
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
+  },
+  addLike: async (req, res) => {
+    const { id: UserId } = req.user
+    try {
+      await Like.create({
+        UserId,
+        RestaurantId: req.params.restaurantId
+      })
+      return res.redirect('back')
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
+  },
+  removeLike: async (req, res) => {
+    try {
+      const like = await Like.findOne({
+        where: {
+          UserId: helpers.getUser(req).id,
+          RestaurantId: req.params.restaurantId
+        }
+      })
+      await like.destroy()
       return res.redirect('back')
     } catch (error) {
       req.flash('error_messages', error.toString())
