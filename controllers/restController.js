@@ -32,7 +32,8 @@ const restController = {
         ...restaurant.dataValues,
         description: restaurant.description.substring(0, 50),
         categoryName: restaurant.Category.name,
-        isFavorited: req.user.FavoritedRestaurants.map(rest => rest.id).includes(restaurant.id)
+        isFavorited: req.user.FavoritedRestaurants.map(rest => rest.id).includes(restaurant.id),
+        isLiked: req.user.LikedRestaurants.map(rest => rest.id).includes(restaurant.id)
       }))
       return res.render('restaurants', {
         restaurants,
@@ -55,11 +56,14 @@ const restController = {
         include: [
           Category,
           { model: Comment, include: [User] },
-          { model: User, as: 'FavoritedUsers' }
+          { model: User, as: 'FavoritedUsers' },
+          { model: User, as: 'LikedUsers' }
         ]
       })
+      const isFavorited = restaurant.FavoritedUsers.map(rest => rest.id).includes(req.user.id)
+      const isLiked = restaurant.LikedUsers.map(rest => rest.id).includes(req.user.id)
       await restaurant.increment('viewCounts', { by: 1 })
-      return res.render('restaurant', { restaurant: restaurant.toJSON() })
+      return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited, isLiked })
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.status(500).redirect('back')
