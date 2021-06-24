@@ -16,16 +16,18 @@
   <div class="col-md-8">
     <p>{{restaurant.description}}</p>
     <a href="/restaurants/{{restaurant.id}}/dashboard" class="btn btn-primary">Dashboard</a>
+    <div class="d-flex mt-2">
     {{#if isFavorited }}
       <form action="/favorite/{{restaurant.id}}?_method=DELETE" method="POST"><button type="submit" class="btn btn-danger">移除最愛</button></form>
     {{else}}
       <form action="/favorite/{{restaurant.id}}" method="POST"><button type="submit" class="btn btn-primary">加到最愛</button></form>
     {{/if}}
     {{#if isLiked}}
-      <form action="/like/{{restaurant.id}}?_method=DELETE" method="POST"><button type="submit" class="btn btn-danger">Unlike</button></form>
+      <form action="/like/{{restaurant.id}}?_method=DELETE" method="POST" class="ms-3"><button type="submit" class="btn btn-danger">Unlike</button></form>
     {{else}}
-      <form action="/like/{{restaurant.id}}" method="POST"><button type="submit" class="btn btn-primary">Like</button></form>
+      <form action="/like/{{restaurant.id}}" method="POST" class="ms-3"><button type="submit" class="btn btn-primary">Like</button></form>
     {{/if}}
+    </div>
   </div>
   <hr>
 </div>
