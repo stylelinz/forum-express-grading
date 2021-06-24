@@ -169,6 +169,26 @@ const userController = {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
     }
+  },
+  getTopUser: async (req, res) => {
+    try {
+      const rawTopUsers = await User.findAll({
+        include: [
+          { model: User, as: 'Followers' }
+        ]
+      })
+      const topUsers = rawTopUsers.map(user => ({
+        ...user.dataValues,
+        FollowerCount: user.Followers.length,
+        isFollowed: req.user.Followings.map(followings => followings.id).includes(user.id)
+      }))
+
+      topUsers.sort((a, b) => a.FollowerCount - b.FollowerCount)
+      return res.render('topUser', { users: topUsers })
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
   }
 }
 
