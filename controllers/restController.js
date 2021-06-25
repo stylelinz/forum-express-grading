@@ -105,6 +105,29 @@ const restController = {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
     }
+  },
+  getTopRestaurants: async (req, res) => {
+    try {
+      const rawRestaurants = await Restaurant.findAll({
+        include: [
+          { model: User, as: 'FavoritedUsers' }
+        ],
+        limit: 10
+      })
+
+      // 撈出資料後開始處理
+      const topRestaurants = rawRestaurants.map(rest => ({
+        ...rest.dataValues,
+        FavoriteCount: rest.FavoritedUsers.length,
+        isFavorited: req.user.FavoritedRestaurants.map(favorites => favorites.id).includes(rest.id)
+      }))
+      topRestaurants.sort((a, b) => b.FavoriteCount - a.FavoriteCount)
+
+      return res.render('topRestaurant', { restaurants: topRestaurants })
+    } catch (error) {
+      req.flash('error_messages', error.toString())
+      return res.redirect('back')
+    }
   }
 }
 

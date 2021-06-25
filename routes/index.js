@@ -32,6 +32,7 @@ module.exports = (app, passport) => {
   app.get('/', authenticateUser, (req, res) => res.redirect('/restaurants'))
   app.get('/restaurants', authenticateUser, restController.getRestaurants)
   app.get('/restaurants/feeds', authenticateUser, restController.getFeeds)
+  app.get('/restaurants/top', authenticateUser, restController.getTopRestaurants)
   app.get('/restaurants/:id/dashboard', authenticateUser, restController.getDashboard)
   app.get('/restaurants/:id', authenticateUser, restController.getRestaurant)
 
@@ -43,6 +44,9 @@ module.exports = (app, passport) => {
 
   app.post('/like/:restaurantId', authenticateUser, userController.addLike)
   app.delete('/like/:restaurantId', authenticateUser, userController.removeLike)
+
+  app.post('/following/:userId', authenticateUser, userController.addFollow)
+  app.delete('/following/:userId', authenticateUser, userController.removeFollow)
 
   app.use('/users', authenticateUser, userRoute)
 
