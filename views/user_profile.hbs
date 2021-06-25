@@ -5,23 +5,85 @@
   <div class="col-md-8">
     <h1>{{profile.name}}</h1>
     <p>{{profile.email}}</p>
-  {{#eq profile.id user.id}}
+    <p><strong>{{profile.Comments.length}}</strong> 已評論餐廳</p>
+    <p><strong>{{profile.FavoritedRestaurants.length}}</strong> 收藏的餐廳</p>
+    <p><strong>{{profile.Followings.length}}</strong> followings</p>
+    <p><strong>{{profile.Followers.length}}</strong> followers</p>
     <div>
+    {{#eq profile.id user.id}}
       <a href="/users/{{user.id}}/edit" class="btn btn-primary">edit</a>
+    {{else}}
+      {{#if isFollowed }}
+        <form action="/following/{{this.id}}?_method=DELETE" method="POST" style="display: contents;"><button
+            type="submit" class="btn btn-danger">取消追蹤</button></form>
+      {{else}}
+        <form action="/following/{{this.id}}" method="POST" style="display: contents;"><button type="submit"
+            class="btn btn-primary">追蹤</button></form>
+      {{/if}}
+    {{/eq}}
     </div>
-  {{/eq}}
+  </div>
+</div>
+<hr>
+<br><br>
+
+<div class="row">
+  <div class="col-sm-6 mb-3">
+    <div class="card">
+      <div class="card-header"> {{profile.Comments.length}} 已評論餐廳</div>
+      <div class="card-body row">
+        {{#each commentedRestaurants}}
+        <div class="col-auto">
+          <a href="/restaurants/{{this.id}}"class="mr-3">
+            <img src="{{this.image}}" alt="{{this.name}}" style="width:100px;">
+          </a>
+        </div>
+        {{/each}}
+        </div>
+    </div>
+  </div>
+  <div class="col-sm-6 mb-3">
+    <div class="card">
+      <div class="card-header"> {{profile.FavoritedRestaurants.length}} 已收藏餐廳</div>
+      <div class="card-body row">
+        {{#each profile.FavoritedRestaurants}}
+        <div class="col-auto">
+          <a href="/restaurants/{{this.id}}"class="mr-3">
+            <img src="{{this.image}}" alt="{{this.name}}" style="width:100px;">
+          </a>
+        </div>
+        {{/each}}
+        </div>
+    </div>
+  </div>
+  <div class="col-sm-6 mb-3">
+    <div class="card">
+      <div class="card-header"> {{profile.Followings.length}} followings (追蹤者)</div>
+      <div class="card-body row">
+        {{#each profile.Followings}}
+        <div class="col-auto">
+          <a href="/users/{{this.id}}"class="mr-3">
+            <img src="{{this.image}}" alt="{{this.name}}" style="width:100px;">
+          </a>
+        </div>
+        {{/each}}
+        </div>
+    </div>
+  </div>
+  <div class="col-sm-6 mb-3">
+    <div class="card">
+      <div class="card-header"> {{profile.Followers.length}} followers (追隨者)</div>
+      <div class="card-body row">
+        {{#each profile.Followers}}
+        <div class="col-auto">
+          <a href="/users/{{this.id}}"class="mr-3">
+            <img src="{{this.image}}" alt="{{this.name}}" style="width:100px;">
+          </a>
+        </div>
+        {{/each}}
+        </div>
+    </div>
   </div>
 </div>
 
-<div class="card">
-  <div class="card-header"> {{profile.Comments.length}} 已評論餐廳</div>
-  <div class="card-body row">
-    {{#each profile.Comments}}
-    <div class="col-auto">
-      <a href="/restaurants/{{this.Restaurant.id}}"class="mr-3">
-        <img src="{{this.Restaurant.image}}" alt="{{this.Restaurant.name}}" style="width:100px;">
-      </a>
-    </div>
-    {{/each}}
-    </div>
-</div>
+

@@ -17,6 +17,19 @@ const upload = (path) => {
   })
 }
 
+// Helper function to remove duplicated elements
+const removeDuplicate = (arr) => {
+  const result = [arr[0]]
+  let previous = arr[0]
+  arr.forEach(element => {
+    if (element.id !== previous.id) {
+      result.push(element)
+      previous = element
+    }
+  })
+  return result
+}
+
 const userController = {
   signUpPage: (req, res) => {
     return res.render('signup')
@@ -65,17 +78,21 @@ const userController = {
       if (!id) {
         throw new Error('Invalid user id.')
       }
+
       const user = (await User.findByPk(id, {
         include: [
-          {
-            model: Comment,
-            include: [Restaurant],
-            nest: true
-          }
+          { model: Comment, include: [Restaurant] },
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          { model: Restaurant, as: 'FavoritedRestaurants' }
         ],
         nest: true
       })).toJSON()
-      return res.render('user_profile', { profile: user })
+
+      const isFollowed = user.Followings.map(following => following.id).includes(id)
+      const commentedRestaurants = removeDuplicate(user.Comments.map(comment => comment.Restaurant))
+
+      return res.render('user_profile', { profile: user, isFollowed, commentedRestaurants })
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
