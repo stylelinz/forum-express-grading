@@ -1,4 +1,4 @@
-const { Restaurant, Category, Comment, User } = require('../models')
+const { Restaurant, Category, Comment, User, sequelize } = require('../models')
 
 const PAGE_LIMIT = 10
 
@@ -108,22 +108,30 @@ const restController = {
   },
   getTopRestaurants: async (req, res) => {
     try {
-      const rawRestaurants = await Restaurant.findAll({
-        include: [
-          { model: User, as: 'FavoritedUsers' }
+      const restaurants = await Restaurant.findAll({
+        attributes: [
+          'id',
+          'name',
+          'image',
+          [sequelize.fn('count', sequelize.col('FavoritedUsers.id')), 'FavoriteCount'],
+          [sequelize.literal(`(exists (select 1 from Favorites where UserId = ${req.user.id} and RestaurantId = Restaurant.id))`), 'isFavorited']
         ],
-        limit: 10
+        group: 'id',
+        include: [
+          {
+            model: User,
+            as: 'FavoritedUsers',
+            attributes: []
+          }
+        ],
+        order: [[sequelize.fn('count', sequelize.col('UserId')), 'DESC'], 'id'],
+        subQuery: false,
+        limit: 10,
+        raw: true,
+        nest: true
       })
 
-      // 撈出資料後開始處理
-      const topRestaurants = rawRestaurants.map(rest => ({
-        ...rest.dataValues,
-        FavoriteCount: rest.FavoritedUsers.length,
-        isFavorited: req.user.FavoritedRestaurants.map(favorites => favorites.id).includes(rest.id)
-      }))
-      topRestaurants.sort((a, b) => b.FavoriteCount - a.FavoriteCount)
-
-      return res.render('topRestaurant', { restaurants: topRestaurants })
+      return res.render('topRestaurant', { restaurants })
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')
