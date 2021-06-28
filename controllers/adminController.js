@@ -90,28 +90,12 @@ const adminController = {
   },
 
   putRestaurant: async (req, res) => {
-    const { name, tel, address, opening_hours, description, CategoryId } = req.body
-    if (!name) {
-      req.flash('error_messages', '名稱為必填。')
-      return res.redirect('back')
-    }
     try {
-      const { file } = req
-      let img
-      if (file) {
-        img = await upload(file.path)
+      const putStatus = await adminService.putRestaurant(req, res)
+      if (putStatus.status !== 'success') {
+        throw Error(putStatus.message)
       }
-      const restaurant = await Restaurant.findByPk(req.params.id)
-      await restaurant.update({
-        name,
-        tel,
-        address,
-        opening_hours,
-        description,
-        image: img.data.link || restaurant.image,
-        CategoryId
-      })
-      req.flash('success_messages', `餐廳 ${name} 更新成功。`)
+      req.flash('success_messages', putStatus.message)
       return res.redirect('/admin/restaurants')
     } catch (error) {
       req.flash('error_messages', error.toString())

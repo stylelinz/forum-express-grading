@@ -74,6 +74,31 @@ const adminController = {
     }
   },
 
+  putRestaurant: async (req, res) => {
+    const { name, tel, address, opening_hours, description, CategoryId } = req.body
+    try {
+      if (!name) {
+        throw new Error('Name did not exist.')
+      }
+      const { file } = req
+      const img = file ? await upload(file.path) : null
+      const restaurant = await Restaurant.findByPk(req.params.id)
+      await restaurant.update({
+        name,
+        tel,
+        address,
+        opening_hours,
+        description,
+        image: img ? img.data.link : restaurant.image,
+        CategoryId
+      })
+      return { status: 'success', message: `Restaurant ${name} was successfully updated.` }
+    } catch (error) {
+      console.log(error.stack)
+      return { status: 'error', message: error.toString() }
+    }
+  },
+
   deleteRestaurant: async (req, res) => {
     try {
       const restaurant = await Restaurant.findByPk(req.params.id)

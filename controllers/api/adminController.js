@@ -61,6 +61,11 @@ const adminController = {
     }
   },
 
+  putRestaurant: async (req, res) => {
+    const putStatus = await adminService.putRestaurant(req, res)
+    return res.json(putStatus)
+  },
+
   deleteRestaurant: async (req, res) => {
     try {
       const deleteStatus = await adminService.deleteRestaurant(req, res)
