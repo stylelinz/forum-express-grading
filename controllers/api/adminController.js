@@ -47,6 +47,15 @@ const adminController = {
     } catch (error) {
       return res.json({ error })
     }
+  },
+
+  deleteRestaurant: async (req, res) => {
+    try {
+      const deleteStatus = await adminService.deleteRestaurant(req, res)
+      return res.json(deleteStatus)
+    } catch (error) {
+      return res.json({ error })
+    }
   }
 }
 

@@ -49,6 +49,16 @@ const adminController = {
     } catch (error) {
       return error
     }
+  },
+
+  deleteRestaurant: async (req, res) => {
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id)
+      await restaurant.destroy()
+      return { status: 'success', message: '' }
+    } catch (error) {
+      throw Error(error)
+    }
   }
 
 }
