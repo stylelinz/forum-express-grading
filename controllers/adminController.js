@@ -84,9 +84,7 @@ const adminController = {
 
   getRestaurant: async (req, res) => {
     try {
-      const restaurant = await Restaurant.findByPk(req.params.id,
-        { raw: true, nest: true, include: [Category] }
-      )
+      const restaurant = await adminService.getRestaurant
       return res.render('admin/restaurant', { restaurant })
     } catch (error) {
       req.flash('error_messages', error.toString())

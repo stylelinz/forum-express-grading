@@ -36,7 +36,16 @@ const adminController = {
       const restaurants = await adminService.getRestaurants(req, res)
       return res.json({ restaurants })
     } catch (error) {
-      console.error(error)
+      return res.json({ error })
+    }
+  },
+
+  getRestaurant: async (req, res) => {
+    try {
+      const restaurant = await adminService.getRestaurant(req, res)
+      return res.json({ restaurant })
+    } catch (error) {
+      return res.json({ error })
     }
   }
 }
