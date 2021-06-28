@@ -2,6 +2,8 @@ const imgur = require('imgur-node-api')
 
 const { Restaurant, User, Category, sequelize } = require('../models')
 
+const adminService = require('../services/adminService')
+
 // Helper function to upload image
 const upload = (path) => {
   imgur.setClientID(process.env.IMGUR_ID)
@@ -31,11 +33,7 @@ const adminController = {
   // Restaurants
   getRestaurants: async (req, res) => {
     try {
-      const restaurants = await Restaurant.findAll({
-        raw: true,
-        nest: true,
-        include: [Category]
-      })
+      const restaurants = await adminService.getRestaurants(req, res)
       return res.render('admin/restaurants', { restaurants })
     } catch (error) {
       console.error(error)
