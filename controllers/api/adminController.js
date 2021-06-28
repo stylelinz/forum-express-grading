@@ -49,6 +49,18 @@ const adminController = {
     }
   },
 
+  postRestaurant: async (req, res) => {
+    try {
+      const postStatus = await adminService.postRestaurant(req, res)
+      if (postStatus.status !== 'success') {
+        throw new Error(postStatus.message)
+      }
+      return res.json(postStatus)
+    } catch (error) {
+      return res.json({ status: 'error', message: error.toString() })
+    }
+  },
+
   deleteRestaurant: async (req, res) => {
     try {
       const deleteStatus = await adminService.deleteRestaurant(req, res)
