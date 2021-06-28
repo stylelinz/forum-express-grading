@@ -43,6 +43,6 @@ app.listen(port, () => {
   console.log(`Express is listening at http://localhost:${port}`)
 })
 
-require('./routes')(app, passport)
+require('./routes')(app)
 
 module.exports = app
