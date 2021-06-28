@@ -39,7 +39,18 @@ const adminController = {
     } catch (error) {
       return error
     }
+  },
+
+  getRestaurant: async (req, res) => {
+    try {
+      return await Restaurant.findByPk(req.params.id,
+        { raw: true, nest: true, include: [Category] }
+      )
+    } catch (error) {
+      return error
+    }
   }
+
 }
 
 module.exports = adminController
