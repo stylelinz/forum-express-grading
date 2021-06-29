@@ -8,6 +8,15 @@ const categoryController = {
     } catch (error) {
       return res.json({ error })
     }
+  },
+
+  postCategory: async (req, res) => {
+    try {
+      const postStatus = await categoryService.postCategory(req, res)
+      return res.json(postStatus)
+    } catch (error) {
+      return res.json({ status: error.name, message: error.message })
+    }
   }
 }
 

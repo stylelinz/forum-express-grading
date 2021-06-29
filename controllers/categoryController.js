@@ -17,17 +17,13 @@ const categoryController = {
   },
 
   postCategory: async (req, res) => {
-    const { name } = req.body
     try {
-      if (!name.trim().length) {
-        throw new Error('Name did not exist.')
-      }
-      await Category.create({ name })
-      req.flash('success_messages', 'Add category success.')
+      const postStatus = await categoryService.postCategory(req, res)
+      req.flash('success_messages', postStatus.message)
       return res.redirect('/admin/categories')
     } catch (error) {
-      req.flash('error_messages', error.toString())
-      return res.status(400).redirect('back')
+      req.flash('error_messages', error.message)
+      return res.redirect('back')
     }
   },
 
