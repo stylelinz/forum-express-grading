@@ -1,8 +1,19 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const passportJWT = require('passport-jwt')
+
+const ExtractJwt = passportJWT.ExtractJwt
+const JwtStrategy = passportJWT.Strategy
+
 const db = require('../models')
 const { User, Restaurant } = db
+
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET
+}
 
 // setup passport strategy
 passport.use(new LocalStrategy(
@@ -31,6 +42,21 @@ passport.use(new LocalStrategy(
     }
   }
 ))
+
+passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, next) => {
+  const user = await User.findByPk(jwtPayload.id, {
+    include: [
+      { model: Restaurant, as: 'FavoritedRestaurants' },
+      { model: Restaurant, as: 'LikedRestaurants' },
+      { model: User, as: 'Followers' },
+      { model: User, as: 'Followings' }
+    ]
+  })
+  if (!user) {
+    return next(null, false)
+  }
+  return next(null, user)
+}))
 
 // serialize and deserialize user
 passport.serializeUser((user, done) => {
