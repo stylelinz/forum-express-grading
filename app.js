@@ -27,6 +27,7 @@ app.use(session({
   saveUninitialized: false
 }))
 app.use(methodOverride('_method'))
+app.use(express.json())
 app.use('/upload', express.static(path.join(__dirname, '/upload')))
 app.use(passport.initialize())
 app.use(passport.session())

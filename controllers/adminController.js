@@ -53,38 +53,22 @@ const adminController = {
   },
 
   postRestaurant: async (req, res) => {
-    const { name, tel, address, opening_hours, description, CategoryId } = req.body
-    if (!name) {
-      req.flash('error_messages', '名稱為必填。')
-      return res.redirect('back')
-    }
-
     try {
-      const { file } = req
-      let img
-      if (file) {
-        img = await upload(file.path)
+      const postStatus = await adminService.postRestaurant(req, res)
+      if (postStatus.status !== 'success') {
+        throw new Error(postStatus.message)
       }
-      await Restaurant.create({
-        name,
-        tel,
-        address,
-        opening_hours,
-        description,
-        image: img.data.link || null,
-        CategoryId
-      })
-      req.flash('success_messages', '新增餐廳成功。')
+      req.flash('success_messages', postStatus.message)
       return res.redirect('/admin/restaurants')
     } catch (error) {
-      console.error(error)
+      req.flash('error_messages', error.toString())
       res.redirect('back')
     }
   },
 
   getRestaurant: async (req, res) => {
     try {
-      const restaurant = await adminService.getRestaurant
+      const restaurant = await adminService.getRestaurant(req, res)
       return res.render('admin/restaurant', { restaurant })
     } catch (error) {
       req.flash('error_messages', error.toString())
@@ -106,28 +90,12 @@ const adminController = {
   },
 
   putRestaurant: async (req, res) => {
-    const { name, tel, address, opening_hours, description, CategoryId } = req.body
-    if (!name) {
-      req.flash('error_messages', '名稱為必填。')
-      return res.redirect('back')
-    }
     try {
-      const { file } = req
-      let img
-      if (file) {
-        img = await upload(file.path)
+      const putStatus = await adminService.putRestaurant(req, res)
+      if (putStatus.status !== 'success') {
+        throw Error(putStatus.message)
       }
-      const restaurant = await Restaurant.findByPk(req.params.id)
-      await restaurant.update({
-        name,
-        tel,
-        address,
-        opening_hours,
-        description,
-        image: img.data.link || restaurant.image,
-        CategoryId
-      })
-      req.flash('success_messages', `餐廳 ${name} 更新成功。`)
+      req.flash('success_messages', putStatus.message)
       return res.redirect('/admin/restaurants')
     } catch (error) {
       req.flash('error_messages', error.toString())
@@ -137,10 +105,11 @@ const adminController = {
 
   deleteRestaurant: async (req, res) => {
     try {
-      const restaurant = await Restaurant.findByPk(req.params.id)
-      await restaurant.destroy()
-      req.flash('success_messages', '餐廳刪除成功。')
-      return res.redirect('/admin/restaurants')
+      const deleteStatus = await adminService.deleteRestaurant(req, res)
+      if (deleteStatus.status === 'success') {
+        req.flash('success_messages', '餐廳刪除成功。')
+        return res.redirect('/admin/restaurants')
+      }
     } catch (error) {
       req.flash('error_messages', error.toString())
       return res.redirect('back')

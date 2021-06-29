@@ -1,5 +1,3 @@
-const { Category } = require('../models')
-
 const categoryService = require('../services/categoryService')
 
 const categoryController = {
@@ -17,47 +15,35 @@ const categoryController = {
   },
 
   postCategory: async (req, res) => {
-    const { name } = req.body
     try {
-      if (!name.trim().length) {
-        throw new Error('Name did not exist.')
-      }
-      await Category.create({ name })
-      req.flash('success_messages', 'Add category success.')
+      const postStatus = await categoryService.postCategory(req, res)
+      req.flash('success_messages', postStatus.message)
       return res.redirect('/admin/categories')
     } catch (error) {
-      req.flash('error_messages', error.toString())
-      return res.status(400).redirect('back')
+      req.flash('error_messages', error.message)
+      return res.redirect('back')
     }
   },
 
   putCategory: async (req, res) => {
-    const { id } = req.params
-    const { name } = req.body
     try {
-      if (!name.trim().length) {
-        throw new Error('Name did not exist.')
-      }
-      const category = await Category.findByPk(id)
-      await category.update({ name })
-      req.flash('success_messages', 'Category name changed.')
+      const putStatus = await categoryService.putCategory(req, res)
+      req.flash('success_messages', putStatus.message)
       return res.redirect('/admin/categories')
     } catch (error) {
-      req.flash('error_messages', error.toString())
-      return res.status(400).redirect('back')
+      req.flash('error_messages', error.message)
+      return res.redirect('back')
     }
   },
 
   deleteCategory: async (req, res) => {
-    const { id } = req.params
     try {
-      const category = await Category.findByPk(id)
-      await category.destroy()
-      req.flash('success_messages', 'Category removed.')
+      const deleteStatus = await categoryService.deleteCategory(req, res)
+      req.flash('success_messages', deleteStatus.message)
       return res.redirect('/admin/categories')
     } catch (error) {
-      req.flash('error_messages', error.toString())
-      return res.status(400).redirect('back')
+      req.flash('error_messages', error.message)
+      return res.redirect('back')
     }
   }
 }
