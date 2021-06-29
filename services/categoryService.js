@@ -31,6 +31,17 @@ const categoryService = {
     } catch (error) {
       throw new Error(error.message)
     }
+  },
+
+  putCategory: async (req, res) => {
+    const { id } = req.params
+    const { name } = req.body
+    if (!name.trim().length) {
+      throw new Error('Name did not exist.')
+    }
+    const category = await Category.findByPk(id)
+    await category.update({ name })
+    return { status: 'success', message: 'Category name update success.' }
   }
 
 }

@@ -28,19 +28,13 @@ const categoryController = {
   },
 
   putCategory: async (req, res) => {
-    const { id } = req.params
-    const { name } = req.body
     try {
-      if (!name.trim().length) {
-        throw new Error('Name did not exist.')
-      }
-      const category = await Category.findByPk(id)
-      await category.update({ name })
-      req.flash('success_messages', 'Category name changed.')
+      const putStatus = await categoryService.putCategory(req, res)
+      req.flash('success_messages', putStatus.message)
       return res.redirect('/admin/categories')
     } catch (error) {
-      req.flash('error_messages', error.toString())
-      return res.status(400).redirect('back')
+      req.flash('error_messages', error.message)
+      return res.redirect('back')
     }
   },
 
