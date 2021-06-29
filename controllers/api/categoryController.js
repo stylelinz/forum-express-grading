@@ -26,6 +26,15 @@ const categoryController = {
     } catch (error) {
       return res.json({ status: error.name, message: error.message })
     }
+  },
+
+  deleteCategory: async (req, res) => {
+    try {
+      const deleteStatus = await categoryService.deleteCategory(req, res)
+      return res.json(deleteStatus)
+    } catch (error) {
+      return res.json({ status: error.name, message: error.message })
+    }
   }
 }
 

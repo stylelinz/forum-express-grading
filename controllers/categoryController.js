@@ -1,5 +1,3 @@
-const { Category } = require('../models')
-
 const categoryService = require('../services/categoryService')
 
 const categoryController = {
@@ -39,15 +37,13 @@ const categoryController = {
   },
 
   deleteCategory: async (req, res) => {
-    const { id } = req.params
     try {
-      const category = await Category.findByPk(id)
-      await category.destroy()
-      req.flash('success_messages', 'Category removed.')
+      const deleteStatus = await categoryService.deleteCategory(req, res)
+      req.flash('success_messages', deleteStatus.message)
       return res.redirect('/admin/categories')
     } catch (error) {
-      req.flash('error_messages', error.toString())
-      return res.status(400).redirect('back')
+      req.flash('error_messages', error.message)
+      return res.redirect('back')
     }
   }
 }

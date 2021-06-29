@@ -42,6 +42,13 @@ const categoryService = {
     const category = await Category.findByPk(id)
     await category.update({ name })
     return { status: 'success', message: 'Category name update success.' }
+  },
+
+  deleteCategory: async (req, res) => {
+    const { id } = req.params
+    const category = await Category.findByPk(id)
+    await category.destroy()
+    return { status: 'success', message: 'Category removed.' }
   }
 
 }
